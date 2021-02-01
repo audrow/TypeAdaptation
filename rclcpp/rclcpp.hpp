@@ -6,6 +6,7 @@
 
 #include "../std_msgs/msg/String.hpp"
 
+
 namespace rclcpp {
 
 void init() {
@@ -28,8 +29,13 @@ struct Publisher {
 };
 
 template<>
+void Publisher<std_msgs::msg::String>::publish(std_msgs::msg::String msg) {
+    std::cout << "Publishing std_msgs::msg::String '" << msg.data << "' on topic '" << name << "'\n";
+}
+
+template<>
 void Publisher<std_msgs::msg::String>::publish(std::shared_ptr<std_msgs::msg::String> msg) {
-    std::cout << "Publishing std_msgs::msg::String '" << msg->data << "' on topic '" << name << "'\n";
+    std::cout << "Publishing shared pointer to std_msgs::msg::String '" << msg->data << "' on topic '" << name << "'\n";
 }
 
 template<>
