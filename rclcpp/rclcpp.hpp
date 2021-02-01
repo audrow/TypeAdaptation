@@ -14,26 +14,29 @@ void init() {
 }
 
 
-template <typename T> 
+template <typename CustomType, typename ROSInterfaceType> 
 struct TypeAdapter {
-  static void serialize(T data) {
-    std::cout << "Generic serialize: " << data << std::endl;
-  }
+  static void serialize(CustomType customType, ROSInterfaceType & msg);
   static void deserialize();
 };
 
 template <>
-void TypeAdapter<std::string>::serialize(std::string data) {
-  std::cout << "serialize std::string '" << data << "'\n";
-}
-
-template <>
-void TypeAdapter<std_msgs::msg::String>::serialize(std_msgs::msg::String data) {
-  std::cout << "serialize std_msgs::msg::String '" << data.data << "'\n";
+void TypeAdapter<std::string, std_msgs::msg::String>::serialize(std::string data, std_msgs::msg::String & msg) {
+  msg.data = data;
+  std::cout << "Serialize std::string '" << data << "'\n";
 }
 
 
 template <typename T>
+void send(T msg);
+
+template <>
+void send(std_msgs::msg::String msg) {
+  std::cout << "Sending std_msgs::msg::String '" << msg.data << "'\n";
+}
+
+
+template <typename CustomType, typename ROSInterfaceType>
 struct Publisher {
   std::string name;
   int queue_size;
@@ -43,27 +46,12 @@ struct Publisher {
     queue_size = queue_size_;
   }
 
-  void publish(T msg) {
-    return TypeAdapter<T>::serialize(msg);
+  void publish(CustomType content) {
+    ROSInterfaceType msg;
+    TypeAdapter<CustomType, ROSInterfaceType>::serialize(content, msg);
+    send<ROSInterfaceType>(msg);
   }
 };
-
-/*
-template<>
-void Publisher<std_msgs::msg::String>::publish(std_msgs::msg::String msg) {
-    std::cout << "Publishing std_msgs::msg::String '" << msg.data << "' on topic '" << name << "'\n";
-}
-
-template<>
-void Publisher<std_msgs::msg::String>::publish(std::shared_ptr<std_msgs::msg::String> msg) {
-    std::cout << "Publishing shared pointer to std_msgs::msg::String '" << msg->data << "' on topic '" << name << "'\n";
-}
-
-template<>
-void Publisher<std::string>::publish(std::string msg) {
-    std::cout << "Publishing std::string '" << msg << "' on topic '" << name << "'\n";
-}
-*/
 
 
 struct Node {
@@ -74,9 +62,9 @@ struct Node {
   static std::shared_ptr<Node> make_shared(std::string name) {
     return std::make_shared<Node>(name);
   }
-  template <typename T>
-  std::shared_ptr<Publisher<T>> create_publisher(std::string name, int queue_size) {
-    return std::make_shared<Publisher<T>>(name, queue_size);
+  template <typename CustomType, typename ROSInterfaceType>
+  std::shared_ptr<Publisher<CustomType, ROSInterfaceType>> create_publisher(std::string name, int queue_size) {
+    return std::make_shared<Publisher<CustomType, ROSInterfaceType>>(name, queue_size);
   }
 };
 }

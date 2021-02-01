@@ -4,27 +4,18 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/String.hpp"
 
-
 /*
- * Next steps:
- * * Make the type adapter
+ * Next steps
+ * * Use a TypeAdapt object to create publisher
  */
-
 
 int main() {
 
-  // Setup
   rclcpp::init();
+
   auto node = rclcpp::Node::make_shared("my node");
+  auto publisher = node->create_publisher<std::string, std_msgs::msg::String>("my/publisher", 10);
 
-
-  // Publish a std::string
-  auto std_string_publisher = node->create_publisher<std::string>("my/std/string/publisher", 10);
-  std_string_publisher->publish("My message");
-
-
-  // Publish a std_msgs::msg::String
-  std_msgs::msg::String msg2;
-  msg2.data = "String data";
-  node->create_publisher<std_msgs::msg::String>("std_msgs/msg/string/value/publisher", 10)->publish(msg2);
+  std::string my_string = "My string data";
+  publisher->publish(my_string);
 }
