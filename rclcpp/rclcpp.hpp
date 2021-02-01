@@ -14,6 +14,25 @@ void init() {
 }
 
 
+template <typename T> 
+struct TypeAdapter {
+  static void serialize(T data) {
+    std::cout << "Generic serialize: " << data << std::endl;
+  }
+  static void deserialize();
+};
+
+template <>
+void TypeAdapter<std::string>::serialize(std::string data) {
+  std::cout << "serialize std::string '" << data << "'\n";
+}
+
+template <>
+void TypeAdapter<std_msgs::msg::String>::serialize(std_msgs::msg::String data) {
+  std::cout << "serialize std_msgs::msg::String '" << data.data << "'\n";
+}
+
+
 template <typename T>
 struct Publisher {
   std::string name;
@@ -24,10 +43,12 @@ struct Publisher {
     queue_size = queue_size_;
   }
 
-  void publish(T msg);
-  void publish(std::shared_ptr<T> msg);
+  void publish(T msg) {
+    return TypeAdapter<T>::serialize(msg);
+  }
 };
 
+/*
 template<>
 void Publisher<std_msgs::msg::String>::publish(std_msgs::msg::String msg) {
     std::cout << "Publishing std_msgs::msg::String '" << msg.data << "' on topic '" << name << "'\n";
@@ -42,6 +63,7 @@ template<>
 void Publisher<std::string>::publish(std::string msg) {
     std::cout << "Publishing std::string '" << msg << "' on topic '" << name << "'\n";
 }
+*/
 
 
 struct Node {

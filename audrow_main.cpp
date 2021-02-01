@@ -24,13 +24,7 @@ int main() {
 
 
   // Publish a std_msgs::msg::String
-  // Shared pointer version
-  auto msg = std::make_shared<std_msgs::msg::String>();
-  msg->data = "String data by shared pointer";
-  node->create_publisher<std_msgs::msg::String>("std_msgs/msg/string/ref/publisher", 10)->publish(msg);
-
-  // Pass by value
   std_msgs::msg::String msg2;
-  msg2.data = "String data by value";
+  msg2.data = "String data";
   node->create_publisher<std_msgs::msg::String>("std_msgs/msg/string/value/publisher", 10)->publish(msg2);
 }
