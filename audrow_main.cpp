@@ -14,7 +14,7 @@ int main() {
   rclcpp::init();
 
   auto node = rclcpp::Node::make_shared("my node");
-  auto publisher = node->create_publisher<std::string, std_msgs::msg::String>("my/publisher", 10);
+  auto publisher = node->create_publisher<rclcpp::TypeAdapter<std::string, std_msgs::msg::String>>("my/publisher", 10);
 
   std::string my_string = "My string data";
   publisher->publish(my_string);

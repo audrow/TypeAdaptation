@@ -36,7 +36,7 @@ void send(std_msgs::msg::String msg) {
 }
 
 
-template <typename CustomType, typename ROSInterfaceType>
+template <typename AdapterType>
 struct Publisher {
   std::string name;
   int queue_size;
@@ -46,9 +46,11 @@ struct Publisher {
     queue_size = queue_size_;
   }
 
+  template <typename CustomType, typename ROSInterfaceType>
   void publish(CustomType content) {
+    // TODO figure out how to pass adapter in but keep this pattern
     ROSInterfaceType msg;
-    TypeAdapter<CustomType, ROSInterfaceType>::serialize(content, msg);
+    AdapterType::serialize(content, msg);
     send<ROSInterfaceType>(msg);
   }
 };
@@ -62,9 +64,9 @@ struct Node {
   static std::shared_ptr<Node> make_shared(std::string name) {
     return std::make_shared<Node>(name);
   }
-  template <typename CustomType, typename ROSInterfaceType>
-  std::shared_ptr<Publisher<CustomType, ROSInterfaceType>> create_publisher(std::string name, int queue_size) {
-    return std::make_shared<Publisher<CustomType, ROSInterfaceType>>(name, queue_size);
+  template <typename AdapterType>
+  std::shared_ptr<Publisher<AdapterType>> create_publisher(std::string name, int queue_size) {
+    return std::make_shared<Publisher<AdapterType>>(name, queue_size);
   }
 };
 }
