@@ -50,7 +50,10 @@ void send(std_msgs::msg::String msg) {
   std::cout << "Sending std_msgs::msg::String '" << msg.data << "'\n";
 }
 
-template <typename ROSMessageT>
+// https://github.com/ros2/rosidl/blob/ef9c561d639aa257b80e4788e6ef33503c9431d8/rosidl_runtime_cpp/include/rosidl_runtime_cpp/traits.hpp#L163-L164
+template <
+  typename MessageT
+>
 struct Publisher {
   std::string name;
   int queue_size;
